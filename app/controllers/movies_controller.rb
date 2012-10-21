@@ -7,6 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
+    if (session[:view_settings]  && !(params[:ratings] || params[:sort]))
+      puts "*******\n"+session[:view_settings].inspect+"\n****************\n"
+      flash.keep
+      redirect_to session[:view_settings]
+    end
+    params[:sort] ||= "id"
     sort = params[:sort]
     if params.include? 'ratings'
       ratings = params[:ratings].keys
@@ -14,6 +20,8 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.order(sort)
     end
+    session[:view_settings] = movies_path(params.slice(:ratings, :sort))
+
   end
 
   def new
